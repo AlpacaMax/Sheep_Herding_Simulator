@@ -1,13 +1,17 @@
-local SHEEP_RADIUS = 20
-local SHEEP_WALK_SPEED = 100
-local SHEEP_RUN_SPEED = 200
+local SHEEP_RADIUS      = 15
+local SHEEP_WALK_SPEED  = 100
+local SHEEP_RUN_SPEED   = 200
+
+local SHEEP_WALK_TIME   = 3
+local SHEEP_IDLE_TIME   = 5
+local SHEEP_EAT_TIME    = 5
 
 local machine = require "statemachine"
 local Sheep = Object:extend()
 
 function Sheep:new()
-    self.x = love.graphics.getWidth() / 2
-    self.y = love.graphics.getHeight() / 2
+    self.x = math.random(10, love.graphics.getWidth() - 10)
+    self.y = math.random(10, love.graphics.getHeight() - 10)
     self.speed_x = 0
     self.speed_y = 0
 
@@ -22,10 +26,10 @@ function Sheep:new()
     self.fsm = machine.create({
         initial = 'init',
         events = {
-            { name = "go", from = {"run", "walk", "idle"}, to = "walk" },
+            { name = "go", from = {"init", "run", "walk", "idle"}, to = "walk" },
             { name = "dog", from = {"run", "walk", "idle", "eat"}, to = "run" },
             { name = "rest", from = {"init", "run", "walk", "idle", "eat"}, to = "idle" },
-            { name = "hungry", from = {"walk", "idle"}, to = "eat" },
+            { name = "hungry", from = {"init", "walk", "idle"}, to = "eat" },
         },
         callbacks = {
             onbeforego = function(self, event, from, to, sheep)
@@ -38,7 +42,7 @@ function Sheep:new()
                     sheep.action = function(dt)
                         timer = timer + dt
 
-                        if (timer > 3) then
+                        if (timer > SHEEP_WALK_TIME) then
                             if (math.random(0, 1) == 1) then
                                 sheep.fsm:rest(sheep)
                             else
@@ -73,7 +77,7 @@ function Sheep:new()
                     local timer = 0
                     sheep.action = function(dt)
                         timer = timer + dt
-                        if (timer > 5) then
+                        if (timer > SHEEP_IDLE_TIME) then
                             if (math.random(0, 1) == 0) then
                                 sheep.fsm:go(sheep)
                             else
@@ -95,7 +99,7 @@ function Sheep:new()
                 local timer = 0
                 sheep.action = function(dt)
                     timer = timer + dt
-                    if (timer > 5) then
+                    if (timer > SHEEP_EAT_TIME) then
                         sheep.color = {
                             red     = 1,
                             green   = 1,
@@ -111,6 +115,15 @@ function Sheep:new()
             end,
         }
     })
+
+    local robin_select = math.random(1, 3)
+    if (robin_select == 1) then
+        self.fsm:rest(self)
+    elseif (robin_select == 2) then
+        self.fsm:go(self)
+    else
+        self.fsm:hungry(self)
+    end
 end
 
 function Sheep:moveRandDirection(changeDirection, newSpeed, dt)
