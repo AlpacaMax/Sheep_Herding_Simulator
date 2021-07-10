@@ -48,8 +48,6 @@ function Dog:update(dt)
         self.speed_y = 0
     end
 
-    print(self.speed_x, self.speed_y)
-
     self.x = self.x + self.speed_x * dt
     self.y = self.y + self.speed_y * dt
 end

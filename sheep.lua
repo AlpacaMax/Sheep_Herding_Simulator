@@ -21,6 +21,70 @@ function Sheep:new()
 
     self.action = nil
 
+    self.image = {
+        idle = {
+            front = love.graphics.newImage("sheep/sheep_front/sheep_front.png"),
+            back  = love.graphics.newImage("sheep/sheep_back/sheep_back.png"),
+            side  = love.graphics.newImage("sheep/sheep_side/sheep_side.png")
+        },
+        walk = {
+            index = 1,
+            front = {},
+            back  = {},
+            side  = {}
+        },
+        run  = {
+            index = 1,
+            front = {},
+            back  = {},
+            side  = {}
+        },
+        eat  = {
+            index = 1,
+            all   = {}
+        }
+    }
+
+    self.frame = self.image.idle.front
+    self.flip = false
+
+    for i = 1, 9 do
+        table.insert(
+            self.image.walk.side, 
+            love.graphics.newImage("sheep/sheep_side/sheep_side_walk/sheep_side_walk"..i..".png")
+        )
+        table.insert(
+            self.image.walk.front,
+            love.graphics.newImage("sheep/sheep_front/sheep_front_walk/sheep_front_walk"..i..".png")
+        )
+        table.insert(
+            self.image.walk.back,
+            love.graphics.newImage("sheep/sheep_back/sheep_back_walk/sheep_back_walk"..i..".png")
+        )
+    end
+
+    for i = 1, 11 do
+        table.insert(
+            self.image.run.side, 
+            love.graphics.newImage("sheep/sheep_side/sheep_side_run/sheep_side_run"..i..".png")
+        )
+        table.insert(
+            self.image.run.front,
+            love.graphics.newImage("sheep/sheep_front/sheep_front_run/sheep_front_run"..i..".png")
+        )
+        table.insert(
+            self.image.run.back,
+            love.graphics.newImage("sheep/sheep_back/sheep_back_run/sheep_back_run"..i..".png")
+        )
+    end
+
+    for i = 1, 5 do
+        table.insert(
+            self.image.eat.all,
+            love.graphics.newImage("sheep/sheep_front/sheep_eating/sheep_continue"..i..".png")
+        )
+    end
+
     self.color = {
         red     = 1,
         green   = 1,
@@ -67,6 +131,23 @@ function Sheep:new()
 
                         sheep.x = sheep.x + sheep.speed_x * dt
                         sheep.y = sheep.y + sheep.speed_y * dt
+
+                        local speed_angle = math.atan(sheep.speed_y, sheep.speed_x)
+                        if (speed_angle >= math.pi / 4 and speed_angle < math.pi * 3 / 4) then
+                            sheep.frame = sheep.image.walk.front[sheep.image.walk.index]
+                            sheep.flip = false
+                        elseif (speed_angle >= math.pi * 3 / 4 or speed_angle < -math.pi * 3 / 4) then
+                            print(speed_angle)
+                            sheep.frame = sheep.image.walk.side[sheep.image.walk.index]
+                            sheep.flip = true
+                        elseif (speed_angle >= -math.pi * 3 / 4 and speed_angle < -math.pi * 1 / 4) then
+                            sheep.frame = sheep.image.walk.back[sheep.image.walk.index]
+                            sheep.flip = false
+                        elseif (speed_angle >= -math.pi / 4 and speed_angle < math.pi / 4) then
+                            sheep.frame = sheep.image.walk.side[sheep.image.walk.index]
+                            sheep.flip = false
+                        end
+                        sheep.image.walk.index = (sheep.image.walk.index) % 9 + 1
                     end
                 end
             end,
@@ -110,6 +191,22 @@ function Sheep:new()
                     elseif(sheep.y > love.graphics.getHeight()) then
                         sheep.y = love.graphics.getHeight()
                     end
+
+                    local speed_angle = math.atan(sheep.speed_y, sheep.speed_x)
+                    if (speed_angle >= math.pi / 4 and speed_angle < math.pi * 3 / 4) then
+                        sheep.frame = sheep.image.run.front[sheep.image.run.index]
+                        sheep.flip = false
+                    elseif (speed_angle >= math.pi * 3 / 4 or speed_angle < -math.pi * 3 / 4) then
+                        sheep.frame = sheep.image.run.side[sheep.image.run.index]
+                        sheep.flip = true
+                    elseif (speed_angle >= -math.pi * 3 / 4 and speed_angle < -math.pi * 1 / 4) then
+                        sheep.frame = sheep.image.run.back[sheep.image.run.index]
+                        sheep.flip = false
+                    elseif (speed_angle >= -math.pi / 4 and speed_angle < math.pi / 4) then
+                        sheep.frame = sheep.image.run.side[sheep.image.run.index]
+                        sheep.flip = false
+                    end
+                    sheep.image.run.index = (sheep.image.run.index) % 11 + 1
                 end
             end,
             onbeforerest = function(self, event, from, to, sheep)
@@ -131,6 +228,9 @@ function Sheep:new()
                                 sheep.fsm:hungry(sheep)
                             end
                         end
+
+                        sheep.frame = sheep.image.idle.front
+                        sheep.flip = false
                     end
                 end
             end,
@@ -162,6 +262,10 @@ function Sheep:new()
                             sheep.fsm:rest(sheep)
                         end
                     end
+
+                    sheep.frame = sheep.image.eat.all[sheep.image.eat.index]
+                    sheep.flip = false
+                    sheep.image.eat.index = sheep.image.eat.index % 5 + 1
                 end
             end,
         }
@@ -178,8 +282,11 @@ function Sheep:new()
 end
 
 function Sheep:draw()
-    love.graphics.setColor(self.color.red, self.color.green, self.color.blue)
-    love.graphics.circle("fill", self.x, self.y, SHEEP_RADIUS, 48)
+    if (self.flip) then
+        love.graphics.draw(self.frame, self.x, self.y, 0, -1, 1)
+    else
+        love.graphics.draw(self.frame, self.x, self.y)
+    end
 end
 
 return Sheep
