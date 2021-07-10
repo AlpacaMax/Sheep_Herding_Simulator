@@ -1,7 +1,7 @@
 function In_polygon(point_x, point_y, vertices)
     -- Check if a point is in a polygon
     -- Param: point_x: X coordinate of the point
-    --        point_y: Y corrdinate of the point
+    --        point_y: Y coordinate of the point
     --        vertices: A table of coordinates of vertices
 
     local is_in_polygon = false
@@ -30,4 +30,8 @@ function In_polygon(point_x, point_y, vertices)
     end
 
     return is_in_polygon
+end
+
+function Distance(xa, ya, xb, yb)
+    return math.sqrt((xa - xb)^2 + (ya - yb)^2)
 end

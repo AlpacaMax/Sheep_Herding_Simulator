@@ -14,6 +14,8 @@ function Dog:new()
         green   = 91/255,
         blue    = 105/255
     }
+
+    self.affect_radius = 100
 end
 
 function Dog:update(dt)
