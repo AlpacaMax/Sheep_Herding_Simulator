@@ -1,14 +1,18 @@
+local SCORE_FONT = love.graphics.newFont(20)
+
 function love.load()
     love.math.setRandomSeed(love.timer.getTime())
     math.randomseed(love.timer.getTime())
 
     love.window.setMode(1000, 618)
+    love.audio.setVolume(0.5)
 
     require "utils"
     require "area"
     Object = require "classic"
     Sheep = require "sheep"
     Dog = require "dog"
+    Bg  = love.graphics.newImage("bg.png")
 
     dog = Dog()
     Sheeps = {}
@@ -17,6 +21,8 @@ function love.load()
         table.insert(Sheeps, new_sheep)
     end
     area = Rectangle_Area(300, 200)
+
+    score = 0
 end
 
 function love.update(dt)
@@ -37,9 +43,12 @@ function love.update(dt)
     end
 
     dog:update(dt)
+
+    score = score + dt
 end
 
 function love.draw()
+    love.graphics.draw(Bg, 0, 0)
     love.graphics.setColor(1, 1, 1)
     love.graphics.polygon('line', area)
 
@@ -51,4 +60,6 @@ function love.draw()
     end
 
     dog:draw()
+
+    love.graphics.print(math.floor(score), SCORE_FONT, 10, 10)
 end

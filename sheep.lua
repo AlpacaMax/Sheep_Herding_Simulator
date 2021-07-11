@@ -1,4 +1,3 @@
-local SHEEP_RADIUS      = 15
 local SHEEP_WALK_SPEED  = 25
 local SHEEP_RUN_SPEED   = 80
 
@@ -9,6 +8,14 @@ local SHEEP_MAX_IDLE_TIME = 8
 local SHEEP_MIN_EAT_TIME  = 5
 local SHEEP_MAX_EAT_TIME  = 10
 local SHEEP_RUN_TIME      = 1
+
+local SHEEP_BOUND_OFFSET  = 16
+
+local SHEEP_VOICE         = love.audio.newSource("SoundEffects/sheep_voice_1.wav", "static")
+
+local DOG_BARK_1 = love.audio.newSource("SoundEffects/dog_bark_1.wav", "static")
+local DOG_BARK_2 = love.audio.newSource("SoundEffects/dog_bark_2.wav", "static")
+local DOG_BARK_3 = love.audio.newSource("SoundEffects/dog_bark_3.wav", "static")
 
 local machine = require "statemachine"
 local Sheep = Object:extend()
@@ -122,10 +129,10 @@ function Sheep:new()
                             end
                         end
 
-                        if (sheep.x < 0 or sheep.x >= love.graphics.getWidth()) then
+                        if (sheep.x < SHEEP_BOUND_OFFSET or sheep.x >= love.graphics.getWidth() - SHEEP_BOUND_OFFSET) then
                             sheep.speed_x = -sheep.speed_x
                         end
-                        if (sheep.y < 0 or sheep.y >= love.graphics.getHeight()) then
+                        if (sheep.y < SHEEP_BOUND_OFFSET or sheep.y >= love.graphics.getHeight() - SHEEP_BOUND_OFFSET) then
                             sheep.speed_y = -sheep.speed_y
                         end
 
@@ -152,6 +159,15 @@ function Sheep:new()
                 end
             end,
             onbeforedog = function(self, event, from, to, sheep, dog)
+                love.audio.play(SHEEP_VOICE)
+                local round_robin = math.random(1, 3)
+                if round_robin == 1 then
+                    love.audio.play(DOG_BARK_1)
+                elseif round_robin == 2 then
+                    love.audio.play(DOG_BARK_2)
+                else
+                    love.audio.play(DOG_BARK_3)
+                end
                 sheep.color = {
                     red = 1,
                     green = 0,
@@ -283,9 +299,9 @@ end
 
 function Sheep:draw()
     if (self.flip) then
-        love.graphics.draw(self.frame, self.x, self.y, 0, -1, 1)
+        love.graphics.draw(self.frame, self.x, self.y, 0, -1, 1, 16, 16)
     else
-        love.graphics.draw(self.frame, self.x, self.y)
+        love.graphics.draw(self.frame, self.x, self.y, 0,  1, 1, 16, 16)
     end
 end
 

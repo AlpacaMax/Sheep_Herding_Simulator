@@ -15,46 +15,93 @@ function Dog:new()
         blue    = 105/255
     }
 
+    self.image = {
+        idle  = love.graphics.newImage("dog/dog3/front/dog3_front.png"),
+        front = {},
+        side  = {},
+        back  = {}
+    }
+    self.index = 1
+    self.frame = nil
+    self.flip = false
+
+    for i = 1, 10 do
+        table.insert(
+            self.image.front,
+            love.graphics.newImage("dog/dog3/front/dog3_front_run"..i..".png")
+        )
+        table.insert(
+            self.image.side,
+            love.graphics.newImage("dog/dog3/side/dog3_side_run"..i..".png")
+        )
+        table.insert(
+            self.image.back,
+            love.graphics.newImage("dog/dog3/back/dog3_back_run"..i..".png")
+        )
+    end
+
     self.affect_radius = 100
 end
 
 function Dog:update(dt)
     if love.keyboard.isDown("w") and love.keyboard.isDown("d") then
-            self.speed_x = DOG_SPEED_DIAGONAL
-            self.speed_y = -DOG_SPEED_DIAGONAL
+        self.speed_x = DOG_SPEED_DIAGONAL
+        self.speed_y = -DOG_SPEED_DIAGONAL
+        self.frame = self.image.back[self.index]
+        self.flip = true
     elseif love.keyboard.isDown("d") and love.keyboard.isDown("s") then
         self.speed_x = DOG_SPEED_DIAGONAL
         self.speed_y = DOG_SPEED_DIAGONAL
+        self.frame = self.image.front[self.index]
+        self.flip = true
     elseif love.keyboard.isDown("s") and love.keyboard.isDown("a") then
         self.speed_x = -DOG_SPEED_DIAGONAL
         self.speed_y = DOG_SPEED_DIAGONAL
+        self.frame = self.image.front[self.index]
+        self.flip = false
     elseif love.keyboard.isDown("a") and love.keyboard.isDown("w") then
         self.speed_x = -DOG_SPEED_DIAGONAL
         self.speed_y = -DOG_SPEED_DIAGONAL
+        self.frame = self.image.back[self.index]
+        self.flip = false
     elseif love.keyboard.isDown("w") then
         self.speed_x = 0
         self.speed_y = -DOG_SPEED
+        self.frame = self.image.back[self.index]
+        self.flip = false
     elseif love.keyboard.isDown("s") then
         self.speed_x = 0
         self.speed_y = DOG_SPEED
+        self.frame = self.image.front[self.index]
+        self.flip = false
     elseif love.keyboard.isDown("a") then
         self.speed_x = -DOG_SPEED
         self.speed_y = 0
+        self.frame = self.image.side[self.index]
+        self.flip = false
     elseif love.keyboard.isDown("d") then
         self.speed_x = DOG_SPEED
         self.speed_y = 0
+        self.frame = self.image.side[self.index]
+        self.flip = true
     else
         self.speed_x = 0
         self.speed_y = 0
+        self.frame = self.image.idle
+        self.flip = false
     end
 
     self.x = self.x + self.speed_x * dt
     self.y = self.y + self.speed_y * dt
+    self.index = self.index % 10 + 1
 end
 
 function Dog:draw()
-    love.graphics.setColor(self.color.red, self.color.green, self.color.blue)
-    love.graphics.circle("fill", self.x, self.y, DOG_RADIUS, 48)
+    if self.flip then
+        love.graphics.draw(self.frame, self.x, self.y, 0, -1, 1, 16, 16)
+    else
+        love.graphics.draw(self.frame, self.x, self.y, 0, 1,  1, 16, 16)
+    end
 end
 
 return Dog
