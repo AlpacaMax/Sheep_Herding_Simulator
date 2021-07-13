@@ -77,7 +77,7 @@ function Sheep:new()
         )
         table.insert(
             self.image.run.front,
-            love.graphics.newImage("sheep/sheep_front/sheep_front_run/sheep_front_run"..i..".png")
+            love.graphics.newImage("sheep/sheep_front/sheep_front_run/Sheep_front_run"..i..".png")
         )
         table.insert(
             self.image.run.back,
