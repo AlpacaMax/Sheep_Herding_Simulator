@@ -159,14 +159,14 @@ function Sheep:new()
                 end
             end,
             onbeforedog = function(self, event, from, to, sheep, dog)
-                love.audio.play(SHEEP_VOICE)
+                -- love.audio.play(SHEEP_VOICE)
                 local round_robin = math.random(1, 3)
                 if round_robin == 1 then
-                    love.audio.play(DOG_BARK_1)
+                    -- love.audio.play(DOG_BARK_1)
                 elseif round_robin == 2 then
-                    love.audio.play(DOG_BARK_2)
+                    -- love.audio.play(DOG_BARK_2)
                 else
-                    love.audio.play(DOG_BARK_3)
+                    -- love.audio.play(DOG_BARK_3)
                 end
                 sheep.color = {
                     red = 1,

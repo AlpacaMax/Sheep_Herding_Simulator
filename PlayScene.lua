@@ -7,7 +7,7 @@ function Scene.load()
     math.randomseed(love.timer.getTime())
 
     love.window.setMode(1000, 618)
-    love.audio.setVolume(0.5)
+    -- love.audio.setVolume(0.5)
 
     require "utils"
     require "area"
